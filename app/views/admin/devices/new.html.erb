@@ -1,0 +1,15 @@
+<% content_for :title, "Neues Gerät erfassen - Admin - GearShare" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Neues Gerät erfassen</h1>
+    <p class="page-subtitle">Fügen Sie dem Inventar ein neues Gerät oder Zubehör hinzu</p>
+  </div>
+  <div>
+    <%= link_to "← Zurück zur Übersicht", admin_devices_path, class: "btn btn-secondary" %>
+  </div>
+</div>
+
+<div class="card" style="max-width: 650px;">
+  <%= render "form", device: @device %>
+</div>

@@ -1,0 +1,45 @@
+<% content_for :title, "Anmelden - GearShare" %>
+
+<div class="auth-box">
+  <div class="auth-header">
+    <h1>Anmelden</h1>
+    <p>Melden Sie sich mit Ihren Zugangsdaten an</p>
+  </div>
+
+  <%= form_with url: login_path, method: :post, local: true do |f| %>
+    <div class="form-group">
+      <%= f.label :email, "E-Mail-Adresse", class: "form-label" %>
+      <%= f.email_field :email, class: "form-control", placeholder: "max@beispiel.ch", required: true, autofocus: true, value: params[:email] %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :password, "Passwort", class: "form-label" %>
+      <%= f.password_field :password, class: "form-control", placeholder: "••••••••", required: true %>
+    </div>
+
+    <div style="margin-top: 1.5rem;">
+      <%= f.submit "Anmelden", class: "btn btn-primary", style: "width: 100%; padding: 0.75rem;" %>
+    </div>
+  <% end %>
+
+  <div style="text-align: center; margin-top: 1.25rem; font-size: 0.9rem;">
+    <span>Noch kein Konto?</span>
+    <%= link_to "Jetzt registrieren", register_path, style: "color: var(--primary); font-weight: 600; text-decoration: none; margin-left: 0.25rem;" %>
+  </div>
+
+  <div class="demo-credentials-box">
+    <h4>Demo-Zugangsdaten</h4>
+    <div class="demo-cred-row">
+      <span><strong>Administrator:</strong> admin@gearshare.ch</span>
+      <span>password123</span>
+    </div>
+    <div class="demo-cred-row">
+      <span><strong>Benutzer (Max):</strong> max@beispiel.ch</span>
+      <span>password123</span>
+    </div>
+    <div class="demo-cred-row">
+      <span><strong>Benutzerin (Anna):</strong> anna@beispiel.ch</span>
+      <span>password123</span>
+    </div>
+  </div>
+</div>

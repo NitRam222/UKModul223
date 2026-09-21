@@ -1,0 +1,27 @@
+admin:
+  name: Admin User
+  email: admin@gearshare.ch
+  password_digest: <%= BCrypt::Password.create('password123', cost: 4) %>
+  role: admin
+  active: true
+
+user_max:
+  name: Max Muster
+  email: max@beispiel.ch
+  password_digest: <%= BCrypt::Password.create('password123', cost: 4) %>
+  role: user
+  active: true
+
+user_anna:
+  name: Anna Beispiel
+  email: anna@beispiel.ch
+  password_digest: <%= BCrypt::Password.create('password123', cost: 4) %>
+  role: user
+  active: true
+
+user_inactive:
+  name: Inactive User
+  email: inactive@beispiel.ch
+  password_digest: <%= BCrypt::Password.create('password123', cost: 4) %>
+  role: user
+  active: false

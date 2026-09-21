@@ -1,0 +1,118 @@
+<% content_for :title, "#{@device.name} - GearShare" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><%= @device.name %></h1>
+    <p class="page-subtitle">Inventar-Nr: <%= @device.inventory_code %> | Kategorie: <%= @device.category %></p>
+  </div>
+  <div style="display: flex; gap: 0.5rem;">
+    <%= link_to "← Zurück zur Übersicht", devices_path, class: "btn btn-secondary" %>
+    <% if admin? %>
+      <%= link_to "Bearbeiten", edit_admin_device_path(@device), class: "btn btn-secondary" %>
+    <% end %>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Gerätedetails</h2>
+      <span class="badge <%= @device.status_badge_class %>"><%= @device.status_label %></span>
+    </div>
+
+    <ul class="detail-list">
+      <li class="detail-item">
+        <span class="detail-label">Name:</span>
+        <span class="detail-value"><strong><%= @device.name %></strong></span>
+      </li>
+      <li class="detail-item">
+        <span class="detail-label">Kategorie:</span>
+        <span class="detail-value"><span class="badge badge-secondary"><%= @device.category %></span></span>
+      </li>
+      <li class="detail-item">
+        <span class="detail-label">Inventar-Code:</span>
+        <span class="detail-value"><code><%= @device.inventory_code %></code></span>
+      </li>
+      <li class="detail-item">
+        <span class="detail-label">Status:</span>
+        <span class="detail-value">
+          <span class="badge <%= @device.status_badge_class %>"><%= @device.status_label %></span>
+        </span>
+      </li>
+      <li class="detail-item">
+        <span class="detail-label">Beschreibung:</span>
+        <span class="detail-value"><%= @device.description.presence || "Keine zusätzliche Beschreibung vorhanden." %></span>
+      </li>
+    </ul>
+
+    <div style="margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--gray-200);">
+      <% if @device.available? %>
+        <%= form_with url: device_loans_path(@device), method: :post, local: true do |f| %>
+          <div class="form-group">
+            <%= f.label :notes, "Notiz / Verwendungszweck (optional)", class: "form-label" %>
+            <%= f.text_field :notes, class: "form-control", placeholder: "z.B. Für Präsentation oder Projektarbeit" %>
+          </div>
+          <%= f.submit "Gerät jetzt ausleihen", class: "btn btn-primary", style: "width: 100%; padding: 0.75rem;" %>
+        <% end %>
+      <% elsif @current_loan && @current_loan.user == current_user %>
+        <div class="alert alert-info">
+          <div>
+            <strong>Sie haben dieses Gerät aktuell ausgeliehen.</strong>
+            <div style="font-size: 0.85rem; margin-top: 0.25rem;">
+              Ausgeliehen am <%= @current_loan.borrowed_at.strftime("%d.%m.%Y um %H:%M Uhr") %>
+            </div>
+          </div>
+        </div>
+        <%= button_to "Gerät jetzt zurückgeben", return_device_loan_path(@current_loan), method: :patch, class: "btn btn-success", style: "width: 100%; padding: 0.75rem;", data: { turbo_confirm: "Möchten Sie dieses Gerät zurückgeben?" } %>
+      <% else %>
+        <div class="alert alert-warning">
+          <div>
+            <strong>Dieses Gerät ist momentan nicht verfügbar.</strong>
+            <% if @current_loan %>
+              <div style="font-size: 0.85rem; margin-top: 0.25rem;">
+                Ausgeliehen seit <%= @current_loan.borrowed_at.strftime("%d.%m.%Y um %H:%M") %>
+                <% if admin? %>
+                  von <strong><%= @current_loan.user.name %></strong> (<%= @current_loan.user.email %>)
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        <button class="btn btn-secondary" disabled style="width: 100%; opacity: 0.6;">Ausleihe nicht möglich</button>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Ausleih-Historie</h2>
+    </div>
+
+    <% if @past_loans.empty? %>
+      <p style="color: var(--gray-500); padding: 1rem 0;">Bisher keine früheren Ausleihen für dieses Gerät verzeichnet.</p>
+    <% else %>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <% if admin? %><th>Ausleiher</th><% end %>
+              <th>Ausgeliehen</th>
+              <th>Zurückgegeben</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @past_loans.each do |pl| %>
+              <tr>
+                <% if admin? %>
+                  <td><%= pl.user.name %></td>
+                <% end %>
+                <td><%= pl.borrowed_at.strftime("%d.%m.%Y %H:%M") %></td>
+                <td><%= pl.returned_at&.strftime("%d.%m.%Y %H:%M") %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  </div>
+</div>

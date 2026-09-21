@@ -1,0 +1,75 @@
+<% content_for :title, "Benutzerverwaltung - Admin - GearShare" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Benutzerverwaltung</h1>
+    <p class="page-subtitle">Rollen, Berechtigungen und Zugriffsstatus aller Benutzer verwalten</p>
+  </div>
+</div>
+
+<div class="table-responsive">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Benutzer</th>
+        <th>E-Mail</th>
+        <th>Rolle</th>
+        <th>Status</th>
+        <th>Aktive Ausleihen</th>
+        <th>Registriert am</th>
+        <th style="text-align: right;">Aktionen</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @users.each do |user| %>
+        <tr>
+          <td>
+            <strong><%= user.name %></strong>
+            <% if user == current_user %>
+              <span class="badge badge-primary" style="margin-left: 0.25rem;">Sie</span>
+            <% end %>
+          </td>
+          <td><%= user.email %></td>
+          <td>
+            <span class="role-tag <%= user.role %>"><%= user.role_name %></span>
+          </td>
+          <td>
+            <% if user.active? %>
+              <span class="badge badge-success">Aktiv</span>
+            <% else %>
+              <span class="badge badge-danger">Deaktiviert</span>
+            <% end %>
+          </td>
+          <td>
+            <% active_count = user.active_loans.count %>
+            <% if active_count > 0 %>
+              <strong style="color: var(--primary);"><%= active_count %> Gerät(e)</strong>
+            <% else %>
+              <span style="color: var(--gray-400);">0</span>
+            <% end %>
+          </td>
+          <td><%= user.created_at.strftime("%d.%m.%Y") %></td>
+          <td style="text-align: right;">
+            <div style="display: inline-flex; gap: 0.35rem;">
+              <%= link_to "Bearbeiten", edit_admin_user_path(user), class: "btn btn-secondary btn-sm" %>
+
+              <% unless user == current_user %>
+                <%= button_to(user.admin? ? "Zu Benutzer" : "Zu Admin",
+                              toggle_role_admin_user_path(user),
+                              method: :patch,
+                              class: "btn btn-outline btn-sm",
+                              data: { turbo_confirm: "Möchten Sie die Rolle von '#{user.name}' wirklich ändern?" }) %>
+
+                <%= button_to(user.active? ? "Deaktivieren" : "Aktivieren",
+                              toggle_active_admin_user_path(user),
+                              method: :patch,
+                              class: "btn #{user.active? ? 'btn-danger' : 'btn-success'} btn-sm",
+                              data: { turbo_confirm: "Möchten Sie das Konto von '#{user.name}' wirklich #{user.active? ? 'deaktivieren' : 'aktivieren'}?" }) %>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

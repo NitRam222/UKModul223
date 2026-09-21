@@ -1,0 +1,7 @@
+log_one:
+  user: admin
+  action: device_create
+  record_type: Device
+  record_id: 1
+  details: "Device created"
+  created_at: <%= 1.day.ago %>

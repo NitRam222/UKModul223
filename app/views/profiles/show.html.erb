@@ -1,0 +1,109 @@
+<% content_for :title, "Mein Profil - GearShare" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Mein Profil</h1>
+    <p class="page-subtitle">Verwalten Sie Ihre persönlichen Angaben und Kontoeinstellungen</p>
+  </div>
+  <div>
+    <%= link_to "Profil bearbeiten", edit_profile_path, class: "btn btn-secondary" %>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Benutzerinformationen</h2>
+    </div>
+    <ul class="detail-list">
+      <li class="detail-item">
+        <span class="detail-label">Name:</span>
+        <span class="detail-value"><strong><%= @user.name %></strong></span>
+      </li>
+      <li class="detail-item">
+        <span class="detail-label">E-Mail:</span>
+        <span class="detail-value"><%= @user.email %></span>
+      </li>
+      <li class="detail-item">
+        <span class="detail-label">Rolle:</span>
+        <span class="detail-value">
+          <span class="role-tag <%= @user.role %>"><%= @user.role_name %></span>
+        </span>
+      </li>
+      <li class="detail-item">
+        <span class="detail-label">Status:</span>
+        <span class="detail-value">
+          <span class="badge <%= @user.active? ? 'badge-success' : 'badge-danger' %>">
+            <%= @user.active? ? 'Aktiv' : 'Inaktiv' %>
+          </span>
+        </span>
+      </li>
+      <li class="detail-item">
+        <span class="detail-label">Mitglied seit:</span>
+        <span class="detail-value"><%= @user.created_at.strftime("%d.%m.%Y um %H:%M Uhr") %></span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Ausleih-Statistik</h2>
+    </div>
+    <ul class="detail-list">
+      <li class="detail-item">
+        <span class="detail-label">Aktive Ausleihen:</span>
+        <span class="detail-value">
+          <strong style="color: var(--primary); font-size: 1.1rem;"><%= @active_loans.count %></strong>
+          <% if @active_loans.any? %>
+            (<%= link_to "zu meinen Ausleihen", my_loans_path, style: "color: var(--primary);" %>)
+          <% end %>
+        </span>
+      </li>
+      <li class="detail-item">
+        <span class="detail-label">Abgeschlossen:</span>
+        <span class="detail-value"><%= @past_loans.count %> Geräte</span>
+      </li>
+      <li class="detail-item">
+        <span class="detail-label">Total Ausleihen:</span>
+        <span class="detail-value"><%= @user.loans.count %> Geräte insgesamt</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Aktuell ausgeliehene Geräte</h2>
+  </div>
+
+  <% if @active_loans.empty? %>
+    <p style="color: var(--gray-500); padding: 1rem 0;">Sie haben aktuell keine Geräte ausgeliehen. <%= link_to "Jetzt Geräte ansehen", root_path, style: "color: var(--primary);" %></p>
+  <% else %>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Gerät</th>
+            <th>Kategorie</th>
+            <th>Inventar-Nr.</th>
+            <th>Ausgeliehen am</th>
+            <th>Aktion</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @active_loans.each do |loan| %>
+            <tr>
+              <td><strong><%= loan.device.name %></strong></td>
+              <td><span class="badge badge-secondary"><%= loan.device.category %></span></td>
+              <td><code><%= loan.device.inventory_code %></code></td>
+              <td><%= loan.borrowed_at.strftime("%d.%m.%Y %H:%M") %></td>
+              <td>
+                <%= button_to "Zurückgeben", return_device_loan_path(loan), method: :patch, class: "btn btn-secondary btn-sm", data: { turbo_confirm: "Möchten Sie '#{loan.device.name}' wirklich zurückgeben?" } %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>

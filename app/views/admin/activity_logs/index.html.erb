@@ -1,0 +1,77 @@
+<% content_for :title, "Aktivitätsprotokoll - Admin - GearShare" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Aktivitätsprotokoll (Audit Trail)</h1>
+    <p class="page-subtitle">Vollständige Nachvollziehbarkeit aller Ausleihen, Änderungen und Systemereignisse</p>
+  </div>
+</div>
+
+<div class="toolbar">
+  <%= form_with url: admin_activity_logs_path, method: :get, local: true, class: "search-form", style: "width: 100%; justify-content: flex-start; flex-wrap: wrap;" do %>
+    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+      <div>
+        <label style="font-size: 0.8rem; font-weight: 600; color: var(--gray-600); margin-right: 0.35rem;">Aktion:</label>
+        <%= select_tag :action_type, options_for_select([["Alle Aktionen", ""]] + @action_types.map { |a| [a.humanize, a] }, params[:action_type]), class: "search-input", style: "min-width: 160px;" %>
+      </div>
+
+      <div>
+        <label style="font-size: 0.8rem; font-weight: 600; color: var(--gray-600); margin-right: 0.35rem;">Benutzer:</label>
+        <%= select_tag :user_id, options_for_select([["Alle Benutzer", ""]] + @users.map { |u| [u.name, u.id] }, params[:user_id]), class: "search-input", style: "min-width: 160px;" %>
+      </div>
+
+      <%= submit_tag "Filtern", class: "btn btn-secondary btn-sm" %>
+      <% if params[:action_type].present? || params[:user_id].present? %>
+        <%= link_to "Filter aufheben", admin_activity_logs_path, class: "btn btn-sm btn-outline" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div class="table-responsive">
+  <table class="table">
+    <thead>
+      <tr>
+        <th style="width: 180px;">Zeitstempel</th>
+        <th>Benutzer</th>
+        <th>Ereignis</th>
+        <th>Objekttyp</th>
+        <th>Details</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if @logs.empty? %>
+        <tr>
+          <td colspan="5" style="text-align: center; color: var(--gray-500); padding: 2rem;">
+            Keine Protokolleinträge gefunden.
+          </td>
+        </tr>
+      <% else %>
+        <% @logs.each do |log| %>
+          <tr>
+            <td style="font-size: 0.85rem; color: var(--gray-600);">
+              <%= log.created_at.strftime("%d.%m.%Y %H:%M:%S") %>
+            </td>
+            <td>
+              <% if log.user %>
+                <strong><%= log.user.name %></strong>
+                <div style="font-size: 0.75rem; color: var(--gray-500);"><%= log.user.role_name %></div>
+              <% else %>
+                <span style="color: var(--gray-400);">System</span>
+              <% end %>
+            </td>
+            <td>
+              <span class="badge <%= log.action_badge_class %>"><%= log.action_label %></span>
+            </td>
+            <td>
+              <code><%= log.record_type || "—" %></code>
+            </td>
+            <td style="color: var(--gray-800);">
+              <%= log.details %>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

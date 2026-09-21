@@ -1,0 +1,27 @@
+available_laptop:
+  name: Laptop 01
+  category: Laptop
+  inventory_code: LAP-001
+  description: Dell XPS 15
+  active: true
+
+borrowed_laptop:
+  name: Laptop 02
+  category: Laptop
+  inventory_code: LAP-002
+  description: Lenovo ThinkPad X1
+  active: true
+
+camera:
+  name: Kamera 01
+  category: Kamera
+  inventory_code: CAM-001
+  description: Sony Alpha 7 IV
+  active: true
+
+inactive_device:
+  name: Alte Kamera
+  category: Kamera
+  inventory_code: CAM-099
+  description: Defekte Kamera
+  active: false

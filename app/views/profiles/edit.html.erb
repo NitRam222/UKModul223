@@ -1,0 +1,61 @@
+<% content_for :title, "Profil bearbeiten - GearShare" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Profil bearbeiten</h1>
+    <p class="page-subtitle">Passen Sie Ihre persönlichen Angaben an</p>
+  </div>
+  <div>
+    <%= link_to "Zurück zum Profil", profile_path, class: "btn btn-secondary" %>
+  </div>
+</div>
+
+<div class="card" style="max-width: 650px;">
+  <% if @user.errors.any? %>
+    <div class="form-errors">
+      <h3>Folgende Fehler traten auf:</h3>
+      <ul>
+        <% @user.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: @user, url: profile_path, method: :patch, local: true do |f| %>
+    <div class="form-group">
+      <%= f.label :name, "Vollständiger Name", class: "form-label" %>
+      <%= f.text_field :name, class: "form-control", required: true %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :email, "E-Mail-Adresse", class: "form-label" %>
+      <%= f.email_field :email, class: "form-control", required: true %>
+    </div>
+
+    <hr style="border: none; border-top: 1px solid var(--gray-200); margin: 1.75rem 0;">
+
+    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--gray-900);">Passwort ändern (optional)</h3>
+    <p class="form-text" style="margin-bottom: 1rem;">Lassen Sie die Passwortfelder leer, wenn Sie Ihr Passwort nicht ändern möchten.</p>
+
+    <div class="form-group">
+      <%= f.label :password, "Neues Passwort", class: "form-label" %>
+      <%= f.password_field :password, class: "form-control", placeholder: "Mindestens 6 Zeichen" %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :password_confirmation, "Neues Passwort wiederholen", class: "form-label" %>
+      <%= f.password_field :password_confirmation, class: "form-control" %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :current_password, "Aktuelles Passwort (zur Bestätigung der Änderung)", class: "form-label" %>
+      <%= f.password_field :current_password, class: "form-control", placeholder: "Ihr derzeitiges Passwort" %>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; margin-top: 2rem;">
+      <%= f.submit "Änderungen speichern", class: "btn btn-primary" %>
+      <%= link_to "Abbrechen", profile_path, class: "btn btn-secondary" %>
+    </div>
+  <% end %>
+</div>

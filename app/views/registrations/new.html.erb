@@ -1,0 +1,50 @@
+<% content_for :title, "Registrieren - GearShare" %>
+
+<div class="auth-box">
+  <div class="auth-header">
+    <h1>Konto erstellen</h1>
+    <p>Registrieren Sie sich für GearShare</p>
+  </div>
+
+  <% if @user.errors.any? %>
+    <div class="form-errors">
+      <h3>Folgende Fehler verhinderten die Registrierung:</h3>
+      <ul>
+        <% @user.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: @user, url: register_path, local: true do |f| %>
+    <div class="form-group">
+      <%= f.label :name, "Vollständiger Name", class: "form-label" %>
+      <%= f.text_field :name, class: "form-control", placeholder: "Max Muster", required: true, autofocus: true %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :email, "E-Mail-Adresse", class: "form-label" %>
+      <%= f.email_field :email, class: "form-control", placeholder: "max@beispiel.ch", required: true %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :password, "Passwort (mind. 6 Zeichen)", class: "form-label" %>
+      <%= f.password_field :password, class: "form-control", placeholder: "••••••••", required: true %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :password_confirmation, "Passwort bestätigen", class: "form-label" %>
+      <%= f.password_field :password_confirmation, class: "form-control", placeholder: "••••••••", required: true %>
+    </div>
+
+    <div style="margin-top: 1.5rem;">
+      <%= f.submit "Konto registrieren", class: "btn btn-primary", style: "width: 100%; padding: 0.75rem;" %>
+    </div>
+  <% end %>
+
+  <div style="text-align: center; margin-top: 1.25rem; font-size: 0.9rem;">
+    <span>Bereits registriert?</span>
+    <%= link_to "Zum Login", login_path, style: "color: var(--primary); font-weight: 600; text-decoration: none; margin-left: 0.25rem;" %>
+  </div>
+</div>

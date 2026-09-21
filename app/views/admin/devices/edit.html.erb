@@ -1,0 +1,15 @@
+<% content_for :title, "Gerät bearbeiten: #{@device.name} - Admin - GearShare" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Gerät bearbeiten</h1>
+    <p class="page-subtitle"><%= @device.name %> (<code><%= @device.inventory_code %></code>)</p>
+  </div>
+  <div>
+    <%= link_to "← Zurück zur Übersicht", admin_devices_path, class: "btn btn-secondary" %>
+  </div>
+</div>
+
+<div class="card" style="max-width: 650px;">
+  <%= render "form", device: @device %>
+</div>

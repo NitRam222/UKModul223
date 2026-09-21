@@ -1,14 +1,55 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+  # Authentication
+  get  "/login",    to: "sessions#new",     as: :login
+  post "/login",    to: "sessions#create"
+  delete "/logout", to: "sessions#destroy", as: :logout
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # Registration
+  get  "/register", to: "registrations#new", as: :register
+  post "/register", to: "registrations#create"
+
+  # Profile
+  get   "/profile",      to: "profiles#show", as: :profile
+  get   "/profile/edit", to: "profiles#edit", as: :edit_profile
+  patch "/profile",      to: "profiles#update"
+
+  # User loans (Meine Ausleihen)
+  get "/my_loans", to: "loans#index", as: :my_loans
+  resources :loans, only: [:index] do
+    member do
+      patch :return_device
+    end
+  end
+
+  # Devices & Borrowing
+  resources :devices, only: [:index, :show] do
+    resources :loans, only: [:create]
+  end
+
+  # Admin Namespace
+  namespace :admin do
+    root to: "devices#index"
+    resources :devices do
+      member do
+        patch :toggle_status
+      end
+    end
+    resources :loans, only: [:index] do
+      member do
+        patch :return_device
+      end
+    end
+    resources :users, only: [:index, :edit, :update] do
+      member do
+        patch :toggle_role
+        patch :toggle_active
+      end
+    end
+    resources :activity_logs, only: [:index]
+  end
+
+  # Root
+  root to: "devices#index"
 end

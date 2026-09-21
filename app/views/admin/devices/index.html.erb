@@ -1,0 +1,95 @@
+<% content_for :title, "Geräteverwaltung - Admin - GearShare" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Geräteverwaltung</h1>
+    <p class="page-subtitle">Hardware-Bestand verwalten, bearbeiten und aktivieren/deaktivieren</p>
+  </div>
+  <div>
+    <%= link_to "+ Neues Gerät erfassen", new_admin_device_path, class: "btn btn-primary" %>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="category-tabs">
+    <%= link_to "Alle (#{Device.count})", admin_devices_path, class: "tab-btn #{'active' if @selected_category.blank? && @status_filter.blank?}" %>
+    <%= link_to "Aktiv (#{Device.active.count})", admin_devices_path(status: 'active'), class: "tab-btn #{'active' if @status_filter == 'active'}" %>
+    <%= link_to "Inaktiv (#{Device.inactive.count})", admin_devices_path(status: 'inactive'), class: "tab-btn #{'active' if @status_filter == 'inactive'}" %>
+    <%= link_to "Aktuell ausgeliehen (#{Loan.active.count})", admin_devices_path(status: 'borrowed'), class: "tab-btn #{'active' if @status_filter == 'borrowed'}" %>
+  </div>
+
+  <%= form_with url: admin_devices_path, method: :get, local: true, class: "search-form" do %>
+    <%= hidden_field_tag :status, @status_filter if @status_filter.present? %>
+    <%= text_field_tag :query, params[:query], placeholder: "Gerät suchen...", class: "search-input" %>
+    <%= submit_tag "Suchen", class: "btn btn-secondary btn-sm" %>
+    <% if params[:query].present? || @status_filter.present? %>
+      <%= link_to "Zurücksetzen", admin_devices_path, class: "btn btn-sm btn-outline" %>
+    <% end %>
+  <% end %>
+</div>
+
+<div class="table-responsive">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Gerät</th>
+        <th>Kategorie</th>
+        <th>Inventar-Nr.</th>
+        <th>Status</th>
+        <th>Ausleihe-Status</th>
+        <th style="text-align: right;">Aktionen</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if @devices.empty? %>
+        <tr>
+          <td colspan="6" style="text-align: center; color: var(--gray-500); padding: 2rem;">
+            Keine Geräte gefunden.
+          </td>
+        </tr>
+      <% else %>
+        <% @devices.each do |device| %>
+          <tr>
+            <td>
+              <div style="font-weight: 600; color: var(--gray-900);">
+                <%= link_to device.name, device_path(device), style: "color: inherit; text-decoration: none;" %>
+              </div>
+              <div style="font-size: 0.8rem; color: var(--gray-500);"><%= truncate(device.description, length: 60) %></div>
+            </td>
+            <td><span class="badge badge-secondary"><%= device.category %></span></td>
+            <td><code><%= device.inventory_code %></code></td>
+            <td>
+              <% if device.active? %>
+                <span class="badge badge-success">Aktiv</span>
+              <% else %>
+                <span class="badge badge-secondary">Inaktiv</span>
+              <% end %>
+            </td>
+            <td>
+              <% if device.current_loan %>
+                <span class="badge badge-warning">Ausgeliehen</span>
+                <div style="font-size: 0.75rem; color: var(--gray-600); margin-top: 0.2rem;">
+                  an <%= device.current_borrower.name %>
+                </div>
+              <% elsif device.active? %>
+                <span class="badge badge-success">Frei</span>
+              <% else %>
+                <span class="badge badge-secondary">—</span>
+              <% end %>
+            </td>
+            <td style="text-align: right;">
+              <div style="display: inline-flex; gap: 0.35rem;">
+                <%= link_to "Bearbeiten", edit_admin_device_path(device), class: "btn btn-secondary btn-sm" %>
+                <%= button_to(device.active? ? "Deaktivieren" : "Aktivieren",
+                              toggle_status_admin_device_path(device),
+                              method: :patch,
+                              class: "btn #{device.active? ? 'btn-danger' : 'btn-success'} btn-sm",
+                              data: { turbo_confirm: "Möchten Sie dieses Gerät wirklich #{device.active? ? 'deaktivieren' : 'aktivieren'}?" }) %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

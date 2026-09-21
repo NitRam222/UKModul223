@@ -1,0 +1,90 @@
+<% content_for :title, "Alle Ausleihen - Admin - GearShare" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Admin: Alle Ausleihen</h1>
+    <p class="page-subtitle">Gesamtübersicht aller aktiven und vergangenen Ausleihen im System</p>
+  </div>
+  <div>
+    <%= link_to "Geräteverwaltung", admin_devices_path, class: "btn btn-secondary" %>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="category-tabs">
+    <%= link_to "Aktive Ausleihen (#{Loan.active.count})", admin_loans_path(filter: 'active'), class: "tab-btn #{'active' if @filter == 'active'}" %>
+    <%= link_to "Abgeschlossen (#{Loan.returned.count})", admin_loans_path(filter: 'returned'), class: "tab-btn #{'active' if @filter == 'returned'}" %>
+    <%= link_to "Gesamthistorie (#{Loan.count})", admin_loans_path(filter: 'all'), class: "tab-btn #{'active' if @filter == 'all'}" %>
+  </div>
+
+  <%= form_with url: admin_loans_path, method: :get, local: true, class: "search-form" do %>
+    <%= hidden_field_tag :filter, @filter %>
+    <%= text_field_tag :query, params[:query], placeholder: "Benutzer oder Gerät suchen...", class: "search-input" %>
+    <%= submit_tag "Suchen", class: "btn btn-secondary btn-sm" %>
+    <% if params[:query].present? %>
+      <%= link_to "Zurücksetzen", admin_loans_path(filter: @filter), class: "btn btn-sm btn-outline" %>
+    <% end %>
+  <% end %>
+</div>
+
+<div class="table-responsive">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Gerät</th>
+        <th>Benutzer</th>
+        <th>Ausgeliehen am</th>
+        <th>Status / Rückgabe am</th>
+        <th>Notiz</th>
+        <th style="text-align: right;">Aktion</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if @loans.empty? %>
+        <tr>
+          <td colspan="6" style="text-align: center; color: var(--gray-500); padding: 2rem;">
+            Keine Ausleihen gefunden.
+          </td>
+        </tr>
+      <% else %>
+        <% @loans.each do |loan| %>
+          <tr>
+            <td>
+              <strong><%= link_to loan.device.name, device_path(loan.device), style: "color: inherit; text-decoration: none;" %></strong>
+              <div style="font-size: 0.8rem; color: var(--gray-500);">
+                <%= loan.device.category %> · <code><%= loan.device.inventory_code %></code>
+              </div>
+            </td>
+            <td>
+              <div style="font-weight: 600;"><%= loan.user.name %></div>
+              <div style="font-size: 0.8rem; color: var(--gray-500);"><%= loan.user.email %></div>
+            </td>
+            <td>
+              <%= loan.borrowed_at.strftime("%d.%m.%Y %H:%M") %>
+            </td>
+            <td>
+              <% if loan.active? %>
+                <span class="badge badge-warning">Aktiv ausgeliehen</span>
+              <% else %>
+                <span class="badge badge-secondary">Zurückgegeben</span>
+                <div style="font-size: 0.8rem; color: var(--gray-500); margin-top: 0.2rem;">
+                  <%= loan.returned_at.strftime("%d.%m.%Y %H:%M") %>
+                </div>
+              <% end %>
+            </td>
+            <td style="color: var(--gray-600); font-size: 0.85rem;">
+              <%= loan.notes.presence || "—" %>
+            </td>
+            <td style="text-align: right;">
+              <% if loan.active? %>
+                <%= button_to "Rückgabe erfassen", return_device_admin_loan_path(loan), method: :patch, class: "btn btn-secondary btn-sm", data: { turbo_confirm: "Gerät '#{loan.device.name}' als zurückgegeben markieren?" } %>
+              <% else %>
+                <span style="color: var(--gray-400); font-size: 0.85rem;">Erledigt</span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

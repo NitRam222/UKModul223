@@ -1,0 +1,104 @@
+<% content_for :title, "Geräteübersicht - GearShare" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Geräteübersicht</h1>
+    <p class="page-subtitle">Verfügbare Hardware und Zubehör für Schule und Betrieb</p>
+  </div>
+  <div>
+    <%= link_to my_loans_path, class: "btn btn-secondary" do %>
+      Meine Ausleihen
+      <% if current_user.active_loans.any? %>
+        <span class="badge badge-warning" style="margin-left: 0.35rem;"><%= current_user.active_loans.count %></span>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="category-tabs">
+    <%= link_to "Alle (#{Device.active.count})", devices_path(query: @search_query), class: "tab-btn #{'active' if @selected_category.blank?}" %>
+    <% @categories.each do |cat| %>
+      <% count = Device.active.where(category: cat).count %>
+      <% if count > 0 %>
+        <%= link_to "#{cat} (#{count})", devices_path(category: cat, query: @search_query), class: "tab-btn #{'active' if @selected_category == cat}" %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%= form_with url: devices_path, method: :get, local: true, class: "search-form" do %>
+    <%= hidden_field_tag :category, @selected_category if @selected_category.present? %>
+    <%= text_field_tag :query, @search_query, placeholder: "Gerät oder Code suchen...", class: "search-input" %>
+    <%= submit_tag "Suchen", class: "btn btn-secondary btn-sm" %>
+    <% if @search_query.present? || @selected_category.present? %>
+      <%= link_to "Zurücksetzen", devices_path, class: "btn btn-sm btn-outline" %>
+    <% end %>
+  <% end %>
+</div>
+
+<div class="table-responsive">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Gerät</th>
+        <th>Kategorie</th>
+        <th>Inventar-Nr.</th>
+        <th>Status</th>
+        <th style="text-align: right;">Aktion</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if @devices.empty? %>
+        <tr>
+          <td colspan="5" style="text-align: center; color: var(--gray-500); padding: 2rem;">
+            Keine Geräte gefunden, die den Filterkriterien entsprechen.
+          </td>
+        </tr>
+      <% else %>
+        <% @devices.each do |device| %>
+          <% is_my_loan = @my_active_loan_ids.include?(device.id) %>
+          <tr>
+            <td>
+              <div style="font-weight: 600; color: var(--gray-900);">
+                <%= link_to device.name, device_path(device), style: "color: inherit; text-decoration: none;" %>
+              </div>
+              <% if device.description.present? %>
+                <div style="font-size: 0.8rem; color: var(--gray-500);"><%= truncate(device.description, length: 75) %></div>
+              <% end %>
+            </td>
+            <td>
+              <span class="badge badge-secondary"><%= device.category %></span>
+            </td>
+            <td>
+              <code><%= device.inventory_code %></code>
+            </td>
+            <td>
+              <% if device.available? %>
+                <span class="badge badge-success">✓ Verfügbar</span>
+              <% elsif is_my_loan %>
+                <span class="badge badge-primary">Von Ihnen ausgeliehen</span>
+              <% else %>
+                <span class="badge badge-warning">Ausgeliehen</span>
+                <% if admin? && device.current_borrower %>
+                  <div style="font-size: 0.75rem; color: var(--gray-500); margin-top: 0.2rem;">
+                    an <%= device.current_borrower.name %>
+                  </div>
+                <% end %>
+              <% end %>
+            </td>
+            <td style="text-align: right;">
+              <% if device.available? %>
+                <%= button_to "Ausleihen", device_loans_path(device), method: :post, class: "btn btn-primary btn-sm", data: { turbo_confirm: "Möchten Sie '#{device.name}' jetzt ausleihen?" } %>
+              <% elsif is_my_loan %>
+                <% my_loan = current_user.active_loans.find_by(device_id: device.id) %>
+                <%= button_to "Zurückgeben", return_device_loan_path(my_loan), method: :patch, class: "btn btn-secondary btn-sm", data: { turbo_confirm: "Möchten Sie '#{device.name}' zurückgeben?" } %>
+              <% else %>
+                <button class="btn btn-secondary btn-sm" disabled style="opacity: 0.55;">Nicht verfügbar</button>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

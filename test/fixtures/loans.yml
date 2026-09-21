@@ -1,0 +1,13 @@
+active_loan:
+  user: user_max
+  device: borrowed_laptop
+  borrowed_at: <%= 2.days.ago %>
+  returned_at: nil
+  notes: "Test active loan"
+
+past_loan:
+  user: user_anna
+  device: available_laptop
+  borrowed_at: <%= 5.days.ago %>
+  returned_at: <%= 3.days.ago %>
+  notes: "Test past loan"

@@ -1,0 +1,90 @@
+<% content_for :title, "Meine Ausleihen - GearShare" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Meine Ausleihen</h1>
+    <p class="page-subtitle">Übersicht über Ihre aktuell geliehenen Geräte und Ihre Historie</p>
+  </div>
+  <div>
+    <%= link_to "Geräte durchstöbern", root_path, class: "btn btn-primary" %>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Aktive Ausleihen (<%= @active_loans.count %>)</h2>
+  </div>
+
+  <% if @active_loans.empty? %>
+    <div style="text-align: center; padding: 2.5rem 1rem; color: var(--gray-500);">
+      <p style="font-size: 1.1rem; margin-bottom: 0.75rem;">Sie haben derzeit keine Geräte ausgeliehen.</p>
+      <%= link_to "Zu den verfügbaren Geräten", root_path, class: "btn btn-outline" %>
+    </div>
+  <% else %>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Gerät</th>
+            <th>Kategorie</th>
+            <th>Inventar-Nr.</th>
+            <th>Ausgeliehen am</th>
+            <th>Notiz</th>
+            <th style="text-align: right;">Aktion</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @active_loans.each do |loan| %>
+            <tr>
+              <td>
+                <strong><%= link_to loan.device.name, device_path(loan.device), style: "color: inherit; text-decoration: none;" %></strong>
+              </td>
+              <td><span class="badge badge-secondary"><%= loan.device.category %></span></td>
+              <td><code><%= loan.device.inventory_code %></code></td>
+              <td><%= loan.borrowed_at.strftime("%d.%m.%Y %H:%M") %></td>
+              <td style="color: var(--gray-600); font-size: 0.85rem;"><%= loan.notes.presence || "—" %></td>
+              <td style="text-align: right;">
+                <%= button_to "Zurückgeben", return_device_loan_path(loan), method: :patch, class: "btn btn-secondary btn-sm", data: { turbo_confirm: "Möchten Sie '#{loan.device.name}' wirklich zurückgeben?" } %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Ausleih-Historie</h2>
+  </div>
+
+  <% if @past_loans.empty? %>
+    <p style="color: var(--gray-500); padding: 1rem 0;">Keine abgeschlossenen Ausleihen vorhanden.</p>
+  <% else %>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Gerät</th>
+            <th>Kategorie</th>
+            <th>Ausgeliehen am</th>
+            <th>Zurückgegeben am</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @past_loans.each do |loan| %>
+            <tr>
+              <td><%= link_to loan.device.name, device_path(loan.device), style: "color: inherit; text-decoration: none;" %></td>
+              <td><span class="badge badge-secondary"><%= loan.device.category %></span></td>
+              <td><%= loan.borrowed_at.strftime("%d.%m.%Y %H:%M") %></td>
+              <td><%= loan.returned_at.strftime("%d.%m.%Y %H:%M") %></td>
+              <td><span class="badge badge-secondary">Zurückgegeben</span></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>

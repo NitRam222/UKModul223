@@ -1,0 +1,51 @@
+<% content_for :title, "Benutzer bearbeiten: #{@user.name} - Admin - GearShare" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Benutzer bearbeiten</h1>
+    <p class="page-subtitle"><%= @user.name %> (<%= @user.email %>)</p>
+  </div>
+  <div>
+    <%= link_to "← Zurück zur Benutzerverwaltung", admin_users_path, class: "btn btn-secondary" %>
+  </div>
+</div>
+
+<div class="card" style="max-width: 600px;">
+  <% if @user.errors.any? %>
+    <div class="form-errors">
+      <h3>Folgende Fehler traten auf:</h3>
+      <ul>
+        <% @user.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: [:admin, @user], local: true do |f| %>
+    <div class="form-group">
+      <%= f.label :name, "Name", class: "form-label" %>
+      <%= f.text_field :name, class: "form-control", required: true %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :email, "E-Mail", class: "form-label" %>
+      <%= f.email_field :email, class: "form-control", required: true %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :role, "Rolle", class: "form-label" %>
+      <%= f.select :role, [["Benutzer (Standard)", "user"], ["Administrator", "admin"]], {}, class: "form-control" %>
+    </div>
+
+    <div class="form-check" style="margin: 1.25rem 0;">
+      <%= f.check_box :active, class: "form-check-input", id: "user_active_check" %>
+      <%= f.label :active, "Benutzerkonto ist aktiv", class: "form-check-label", for: "user_active_check" %>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+      <%= f.submit "Speichern", class: "btn btn-primary" %>
+      <%= link_to "Abbrechen", admin_users_path, class: "btn btn-secondary" %>
+    </div>
+  <% end %>
+</div>
