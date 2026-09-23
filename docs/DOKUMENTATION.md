@@ -1,20 +1,19 @@
 # Projektdokumentation: GearShare
+
 ## Multiuser-Applikation für Geräteausleihe und Geräteverwaltung
 
 ---
 
-### Titelblatt
+## Titelblatt
 
 | Parameter | Angabe |
 | :--- | :--- |
-| **Modul** | **Modul 223: Multi-User-Applikationen objektorientiert realisieren** |
-| **Projektname** | **GearShare** |
+| **Modul** | Modul 223: Multi-User-Applikationen objektorientiert realisieren |
+| **Projektname** | GearShare |
 | **Projektart** | Multiuser-Webapplikation (Ruby on Rails 8 / SQLite3) |
-| **Datum** | 21.09.2026 |
+| **Datum** | 25.09.2026 |
 | **Autor** | Martin Evers |
 | **Schulklasse** | 24-223-E |
-| **Ausbildungsstätte**| Informatik Lehrbetriebsverband (ilv) |
-| **Version** | 1.0 (Final Release) |
 
 ---
 
@@ -44,20 +43,17 @@
    - 5.3 Tabellendefinitionen und Datentypen
 6. [User Flows & Breadboards](#6-user-flows--breadboards)
    - 6.1 Breadboard-Konzept der 1. Iteration
-   - 6.2 Detaillierte Benutzerabläufe
 7. [Benutzerschnittstelle & Wireframes](#7-benutzerschnittstelle--wireframes)
    - 7.1 Konzeptskizzen (Fat-Marker-Sketches)
    - 7.2 Implementierte Screens (Gegenüberstellung)
 8. [Erreichter Stand & Umsetzung](#8-erreichter-stand--umsetzung)
    - 8.1 Implementierte Features
-   - 8.2 Benutzerprofil & Benutzerverwaltung
-   - 8.3 Aktivitätsprotokoll (Audit Trail)
 9. [Begründete Abweichungen vom initialen Antrag](#9-begründete-abweichungen-vom-initialen-antrag)
 10. [Testkonzept und Anforderungsprüfung (Testprotokoll)](#10-testkonzept-und-anforderungsprüfung-testprotokoll)
     - 10.1 Teststrategie
     - 10.2 Prüfung der zentralen Fachregel
     - 10.3 Concurrency-Test (Multi-Threading)
-    - 10.4 Tabellarisches Testprotokoll (62 Tests)
+    - 10.4 Tabellarisches Testprotokoll
 11. [Reflexion und Fazit](#11-reflexion-und-fazit)
     - 11.1 Erkenntnisse bei der Entwicklung von Multi-User-Systemen
     - 11.2 Fazit
@@ -67,42 +63,49 @@
 ## 1. Problemstellung
 
 ### 1.1 Ausgangslage und Relevanz
-In Schulen, Bildungsinstituten und Unternehmen werden teure Arbeits- und Schulungsgeräte – wie z.B. leistungsstarke Laptops, DSLR- und spiegellose Kameras, Spezialadapter, Audio-Mikrofone und Tablets – von vielen verschiedenen Personen gemeinsam genutzt. In der Praxis führt dies ohne zentrales System regelmässig zu schwerwiegenden organisatorischen Problemen:
 
-- **Intransparenz des Bestands:** Lernende oder Mitarbeitende wissen nicht, ob ein bestimmtes Gerät aktuell frei im Schrank liegt oder wer es gerade nutzt.
-- **Doppelbelegungen und Konflikte:** Zwei Personen planen dieselbe Kamera für ein Projekt ein oder leihen dasselbe Gerät abweichend voneinander aus.
-- **Verlust und mangelnde Nachvollziehbarkeit:** Wird ein Gerät nicht rechtzeitig zurückgebracht, ist unklar, wer zuletzt dafür verantwortlich war.
-- **Analoge Zettellisten oder Excel-Tabellen versagen:** Herkömmliche Papierlisten werden nicht gepflegt, und gemeinsam geteilte Tabellen bieten keine Concurrency-Sicherheit (Gleichzeitigkeit) und keine Berechtigungsschranken.
+In Schulen und Unternehmen werden Geräte wie Laptops, Kameras, Adapter, Mikrofone und Tablets von mehreren Personen genutzt. Ohne ein zentrales System entstehen dabei schnell Probleme:
 
-Diese Problemstellung tritt in jedem Schul- und Arbeitssemester mehrfach wöchentlich auf und bindet unnötige Ressourcen von Lehrpersonen, IT-Verantwortlichen und Lernenden.
+- **Unklare Verfügbarkeit:** Lernende oder Mitarbeitende wissen nicht immer, ob ein Gerät frei ist oder wer es gerade benutzt.
+- **Doppelbelegungen:** Zwei Personen versuchen, dasselbe Gerät gleichzeitig auszuleihen.
+- **Fehlende Nachvollziehbarkeit:** Wenn ein Gerät nicht zurückgebracht wird, ist oft unklar, wer es zuletzt ausgeliehen hat.
+- **Papierlisten und einfache Excel-Tabellen reichen dafür nicht aus:** Sie werden leicht falsch gepflegt und bieten keine sichere Lösung für gleichzeitige Zugriffe und Berechtigungen.
+
+Solche Probleme können im Schul- oder Arbeitsalltag regelmässig auftreten und verursachen zusätzlichen Aufwand.
 
 ### 1.2 Zielgruppen und alltägliche Herausforderungen
-1. **Benutzer (Lernende, Mitarbeitende):** Wollen in Echtzeit sehen, welche Hardware verfügbar ist, diese mit einem Klick verbindlich ausleihen und nach Abschluss der Arbeit einfach zurückbuchen.
-2. **Administratoren (IT-Verantwortliche, Lehrpersonen):** Benötigen eine lückenlose Inventarübersicht, müssen Geräte neu anlegen, bearbeiten oder vorübergehend sperren/deaktivieren können, alle aktiven Ausleihen überwachen und über ein Aktivitätsprotokoll Audit-Fähigkeit sicherstellen.
+
+1. **Benutzer (Lernende, Mitarbeitende):** Sie möchten sehen, welche Geräte verfügbar sind, ein Gerät ausleihen und es später einfach zurückgeben.
+2. **Administratoren (IT-Verantwortliche, Lehrpersonen):** Sie verwalten die Geräte, sehen aktive Ausleihen und können Geräte anlegen, bearbeiten oder deaktivieren. Wichtige Aktionen werden im Aktivitätsprotokoll gespeichert.
 
 ---
 
 ## 2. Projekt & Vision
 
 ### 2.1 Fachbereich / Domäne
+
 - **Domäne:** Geräteausleihe und Hardware-Inventarverwaltung (Device Lending & Resource Management)
 - **Klassifizierung:** Multi-User Webapplikation mit Transaktionssicherheit
 
 ### 2.2 Name und Markenidentität
-- **Applikationsname:** **GearShare**
+
+- **Applikationsname:** GearShare
 - **Slogan:** *Zuverlässige Geräteausleihe. Keine Doppelbelegungen. Jederzeit transparent.*
 
 ### 2.3 Projektvision
-GearShare bietet eine intuitive, browserbasierte Plattform, die das gemeinsame Nutzen von Geräten vollständig automatisiert. Durch ein intelligentes Locking-System garantiert GearShare, dass jedes Gerät zu jedem Zeitpunkt durch höchstens eine Person ausgeliehen sein kann. Technische Fehler werden vermieden, Berechtigungen werden strikt durchgesetzt und alle Aktionen werden transparent protokolliert.
+
+GearShare ist eine einfache Plattform im Browser, mit der Geräte ausgeliehen und verwaltet werden können. Das System sorgt dafür, dass ein Gerät immer nur von einer Person gleichzeitig ausgeliehen werden kann. So werden Fehler vermieden und die Ausleihe bleibt übersichtlich. Ausserdem werden Berechtigungen geprüft und wichtige Aktionen gespeichert.
 
 ### 2.4 MVP-Scope (1. Iteration)
-In der ersten Iteration (MVP) steht der durchgängige Kernablauf der Multi-User-Geräteausleihe im Zentrum:
+
+In der ersten Iteration (MVP) wird der wichtigste Ablauf der Geräteausleihe umgesetzt:
+
 1. Benutzer meldet sich am System an (Authentifizierung).
 2. Benutzer sieht eine filterbare Übersicht aller Geräte samt aktuellem Verfügbarkeitsstatus.
 3. Benutzer leiht ein verfügbares Gerät aus.
-4. Die Applikation prüft atomar und sperrend, ob das Gerät im selben Moment noch frei ist.
+4. Die Applikation prüft mit einer Transaktion und einem Lock, ob das Gerät noch frei ist.
 5. Benutzer kann eigene geliehene Geräte in einer persönlichen Übersicht einsehen und zurückgeben.
-6. **Zentrale Schutzregel:** Zwei Benutzer können dasselbe Gerät unter keinen Umständen gleichzeitig ausleihen.
+6. **Zentrale Regel:** Ein Gerät kann immer nur von einer Person gleichzeitig ausgeliehen werden.
 
 ---
 
@@ -112,118 +115,70 @@ In der ersten Iteration (MVP) steht der durchgängige Kernablauf der Multi-User-
 
 | ID | Priorität | Anforderung | Beschreibung |
 | :--- | :---: | :--- | :--- |
-| **FA-01** | **1** | **Geräteübersicht anzeigen** | Authentifizierte Benutzer können alle aktiven Geräte mit Kategorie, Inventar-Code und Status (Verfügbar / Ausgeliehen) in Echtzeit einsehen und durchsuchen. |
+| **FA-01** | **1** | **Geräteübersicht anzeigen** | Angemeldete Benutzer können alle aktiven Geräte mit Kategorie, Inventar-Code und Status sehen und durchsuchen. |
 | **FA-02** | **1** | **Verfügbares Gerät ausleihen** | Ein Benutzer kann ein freies Gerät für sich buchen. Der Status wechselt sofort auf «Ausgeliehen». |
-| **FA-03** | **1** | **Eigene Geräte zurückgeben** | Benutzer können ihre aktuell geliehenen Geräte mit Bestätigung zurückgeben, wodurch das Gerät sofort wieder frei wird. |
-| **FA-04** | **1** | **Persönliche Ausleihen anzeigen** | Benutzer haben eine dedizierte Sicht («Meine Ausleihen») auf alle ihre aktiven Ausleihen und ihre vergangene Ausleihhistorie. |
-| **FA-05** | **1** | **Konkurrierende Ausleihen abweisen** | Versucht ein Benutzer ein Gerät auszuleihen, das im selben Moment von einem anderen Benutzer reserviert wurde, wird der Vorgang abgelehnt und eine verständliche Rückmeldung ausgegeben. |
-| **FA-06** | **2** | **Geräte erfassen und bearbeiten** | Administratoren können neue Geräte mit Name, Kategorie, Inventarnummer und Beschreibung anlegen und bestehende Daten modifizieren. |
+| **FA-03** | **1** | **Eigene Geräte zurückgeben** | Benutzer können ihre ausgeliehenen Geräte zurückgeben. Danach ist das Gerät wieder verfügbar. |
+| **FA-04** | **1** | **Persönliche Ausleihen anzeigen** | Unter «Meine Ausleihen» sehen Benutzer ihre aktiven und früheren Ausleihen. |
+| **FA-05** | **1** | **Konkurrierende Ausleihen abweisen** | Wenn zwei Benutzer gleichzeitig dasselbe Gerät ausleihen möchten, wird nur eine Ausleihe durchgeführt. Der andere Benutzer erhält eine verständliche Meldung. |
+| **FA-06** | **2** | **Geräte erfassen und bearbeiten** | Administratoren können Geräte mit Name, Kategorie, Inventarnummer und Beschreibung anlegen und bearbeiten. |
 | **FA-07** | **2** | **Gerätestatus aktivieren / deaktivieren** | Administratoren können Geräte vorübergehend deaktivieren (z.B. bei Wartung). Ausgeliehene Geräte sind vor Deaktivierung geschützt. |
-| **FA-08** | **2** | **Gesamtübersicht aller Ausleihen** | Administratoren haben Zugriff auf alle aktiven Ausleihen aller Benutzer und können bei Bedarf Rückgaben stellvertretend erfassen. |
+| **FA-08** | **2** | **Gesamtübersicht aller Ausleihen** | Administratoren sehen alle aktiven Ausleihen und können bei Bedarf ein Gerät für einen Benutzer zurückgeben. |
 | **FA-09** | **2** | **Benutzerverwaltung** | Administratoren können Benutzerrollen vergeben (Admin / User) und Konten aktivieren oder deaktivieren. |
-| **FA-10** | **2** | **Aktivitätsprotokoll (Audit Trail)** | Alle systemrelevanten Aktionen (Ausleihen, Rückgaben, Gerätemutationen, Anmeldungen) werden revisionssicher mit Zeitstempel und Benutzer protokolliert. |
+| **FA-10** | **2** | **Aktivitätsprotokoll (Audit Trail)** | Wichtige Aktionen wie Ausleihen, Rückgaben, Änderungen an Geräten und Anmeldungen werden mit Zeitstempel und Benutzer gespeichert. |
 
 ### 3.2 Nicht-funktionale Qualitätsattribute (überprüfbar)
 
 | ID | Qualitätsattribut | Konkrete Metrik & Überprüfbarkeit für GearShare |
 | :--- | :--- | :--- |
-| **QA-01** | **Datenkonsistenz & Concurrency** | Wenn zwei Benutzer innerhalb derselben Millisekunde für das letzte freie Gerät auf «Ausleihen» klicken, wird **exakt eine Ausleihe** in der Datenbank persistiert. Die zweite Anfrage wird abgewiesen, ohne dass Inkonsistenzen entstehen. Getestet via automatisierter Multi-Threading-Prüfung (`concurrency_test.rb`). |
-| **QA-02** | **Berechtigungssicherheit** | Standard-Benutzer können keine Administratorfunktionen aufrufen. Direkte HTTP-Anfragen auf `/admin/*` werden serverseitig abgefangen, mit HTTP 302 umgeleitet und mit der Meldung *«Zugriff verweigert: Für diesen Bereich sind Administratorrechte erforderlich»* abgewiesen. Keine sensiblen Daten werden preisgegeben. |
-| **QA-03** | **Performance & Skalierbarkeit** | Die Geräteübersicht wird bei einem Datenbestand von 1'000 Geräten und zehn gleichzeitigen Anfragen innerhalb von **unter 500 Millisekunden** (deutlich unter der geforderten 2-Sekunden-Grenze) ausgeliefert. Indizes auf `inventory_code`, `category`, `active` und `returned_at` garantieren $O(\log n)$ Suchzugriffe. |
-| **QA-04** | **Fehlerbehandlung & User Feedback** | Bei fachlichen oder technischen Konflikten erhält der Benutzer **niemals eine ungefilterte Fehlermeldung** (wie 500 Internal Server Error, Rails-Stacktrace oder DB-Unique-Constraint-Violations). Stattdessen wird eine klare, lösungsorientierte Benachrichtigung angezeigt (*«Das Gerät wurde inzwischen von einem anderen Benutzer ausgeliehen»*). Formulardaten bleiben bei Validierungsfehlern vollständig erhalten. |
+| **QA-01** | **Datenkonsistenz & Concurrency** | Wenn zwei Benutzer innerhalb derselben Millisekunde für das letzte freie Gerät auf «Ausleihen» klicken, wird genau eine Ausleihe in der Datenbank gespeichert. Die zweite Anfrage wird abgewiesen. Dies wird mit einem automatisierten Multi-Threading-Test (`concurrency_test.rb`) geprüft. |
+| **QA-02** | **Berechtigungssicherheit** | Normale Benutzer können keine Administratorfunktionen verwenden. Direkte Anfragen an `/admin/*` werden serverseitig blockiert und umgeleitet. Dabei wird eine verständliche Meldung angezeigt. |
+| **QA-03** | **Performance & Skalierbarkeit** | Die Geräteübersicht wird bei 1'000 Geräten und zehn gleichzeitigen Anfragen in weniger als 500 Millisekunden geladen. Indizes auf `inventory_code`, `category`, `active` und `returned_at` verbessern die Suche. |
+| **QA-04** | **Fehlerbehandlung & User Feedback** | Bei fachlichen oder technischen Konflikten erhält der Benutzer niemals eine ungefilterte Fehlermeldung wie einen Rails-Stacktrace oder einen Datenbankfehler. Stattdessen wird eine verständliche Meldung angezeigt. Bereits eingegebene Formulardaten bleiben bei Validierungsfehlern erhalten. |
 
-### 3.3 Benutzerrollen und Berechtigungsmatrix
+### 3.3 Benutzerrollen und Berechtigungsmatrix (True, False)
 
 | Funktion / Ressource | Nicht angemeldet | Rolle: Benutzer (User) | Rolle: Administrator (Admin) |
 | :--- | :---: | :---: | :---: |
-| Startseite / Geräteübersicht | ❌ (Redirect Login) | ✅ (Lesen) | ✅ (Lesen) |
-| Gerät suchen / filtern | ❌ | ✅ | ✅ |
-| Gerätedetails ansehen | ❌ | ✅ | ✅ |
-| Freies Gerät ausleihen | ❌ | ✅ | ✅ |
-| Eigene Geräte zurückgeben | ❌ | ✅ | ✅ |
-| Fremde Geräte zurückgeben | ❌ | ❌ | ✅ (Notfall-Rückgabe) |
-| Eigene Ausleihen einsehen | ❌ | ✅ | ✅ |
-| Alle Ausleihen aller User | ❌ | ❌ | ✅ |
-| Geräte anlegen & editieren | ❌ | ❌ | ✅ |
-| Geräte aktivieren / deaktivieren | ❌ | ❌ | ✅ |
-| Benutzerrollen verwalten | ❌ | ❌ | ✅ |
-| Aktivitätsprotokoll einsehen | ❌ | ❌ | ✅ |
-| Eigenes Profil pflegen | ❌ | ✅ | ✅ |
+| Startseite / Geräteübersicht | F (Redirect Login) | T (Lesen) | T (Lesen) |
+| Gerät suchen / filtern | F | T | T |
+| Gerätedetails ansehen | F | T | T |
+| Freies Gerät ausleihen | F | T | T |
+| Eigene Geräte zurückgeben | F | T | T |
+| Fremde Geräte zurückgeben | F | F | T (Notfall-Rückgabe) |
+| Eigene Ausleihen einsehen | F | T | T |
+| Alle Ausleihen aller User | F | F | T |
+| Geräte anlegen und editieren | F | F | T |
+| Geräte aktivieren / deaktivieren | F | F | T |
+| Benutzerrollen verwalten | F | F | T |
+| Aktivitätsprotokoll einsehen | F | F | T |
+| Eigenes Profil pflegen | F | T | T |
 
 ---
 
 ## 4. Transaktionen und Locking (Multi-User-Konzept)
 
 ### 4.1 Die Kernherausforderung: Race Conditions
-In einer Multi-User-Umgebung greifen viele Benutzer gleichzeitig auf dieselbe Ressource zu. Ohne koordinierte Transaktionen und Locks tritt folgendes klassisches Szenario (*Race Condition*) auf:
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor UserA as Benutzerin Anna
-    participant App as GearShare Server
-    participant DB as SQLite3 Datenbank
-    actor UserB as Benutzer Max
+In einer Multi-User-Applikation können mehrere Benutzer gleichzeitig auf dieselben Daten zugreifen. Ohne Transaktionen und Locks kann dadurch eine Race Condition entstehen.
 
-    Note over UserA,UserB: Beide sehen Laptop 01 als "Verfügbar"
-    UserA->>App: Klickt "Ausleihen" (Thread 1)
-    UserB->>App: Klickt "Ausleihen" (Thread 2)
-    App->>DB: Thread 1 prüft: Ist Laptop 01 frei? -> JA
-    App->>DB: Thread 2 prüft: Ist Laptop 01 frei? -> JA (vor Thread 1 Commit!)
-    App->>DB: Thread 1 speichert Ausleihe für Anna
-    App->>DB: Thread 2 speichert Ausleihe für Max
-    Note over DB: FATAL: Zwei aktive Ausleihen für dasselbe Gerät!
-```
+Beispiel: Zwei Benutzer sehen dasselbe Gerät gleichzeitig als verfügbar und versuchen beide, es auszuleihen. Ohne Schutz könnte das Gerät zweimal aktiv ausgeliehen werden.
 
 ### 4.2 Zweistufiges Schutzkonzept
-GearShare verhindert dieses Problem durch eine **Defense-in-Depth-Architektur** auf zwei Ebenen:
-1. **Applikationsebene (Pessimistisches Locking & DB-Transaktion):** Der Datensatz des Geräts wird mit `Device.lock.find(...)` bzw. `device.with_lock` gesperrt (`SELECT FOR UPDATE`). Andere Transaktionen müssen warten, bis die erste abgeschlossen ist.
-2. **Datenbankebene (Partieller Unique Constraint Index):** Als letzte Sicherheitsbarriere erzwingt ein partieller Index auf der Tabelle `loans`, dass für eine `device_id` zu jedem Zeitpunkt höchstens eine Zeile mit `returned_at IS NULL` existieren darf.
+
+GearShare verhindert dieses Problem auf zwei Ebenen:
+
+1. **Applikationsebene:** Der Datensatz des Geräts wird mit `Device.lock.find(...)` oder `device.with_lock` gesperrt. Dabei wird `SELECT FOR UPDATE` verwendet. Andere Transaktionen warten, bis die erste abgeschlossen ist.
+2. **Datenbankebene:** Zusätzlich gibt es auf der Tabelle `loans` eine Regel für `device_id` und `returned_at IS NULL`. Dadurch kann pro Gerät nur eine aktive Ausleihe gleichzeitig existieren.
 
 ### 4.3 Pessimistisches Locking & Transaktionscode
-Die Ausleihlogik ist in der Methode `Loan.borrow!` gekapselt:
 
-```ruby
-def self.borrow!(user:, device:, notes: nil)
-  Device.transaction do
-    # 1. Pessimistisches Sperren der Device-Zeile
-    locked_device = Device.lock.find(device.id)
+Die Logik für die Ausleihe befindet sich in der Methode `Loan.borrow!`.
 
-    unless locked_device.active?
-      raise LoanError, "Das Gerät ist inaktiv und kann nicht ausgeliehen werden."
-    end
-
-    # 2. Zentrale Fachregel pruefen
-    if locked_device.loans.where(returned_at: nil).exists?
-      raise LoanError, "Das Gerät wurde inzwischen von einem anderen Benutzer ausgeliehen."
-    end
-
-    # 3. Ausleihe atomar persistieren
-    loan = locked_device.loans.create!(
-      user: user,
-      borrowed_at: Time.current,
-      notes: notes
-    )
-
-    # 4. Revisionssicheres Audit-Logging
-    ActivityLog.create!(
-      user: user,
-      action: "borrow",
-      record_type: "Device",
-      record_id: locked_device.id,
-      details: "#{user.name} (#{user.email}) hat #{locked_device.name} [#{locked_device.inventory_code}] ausgeliehen."
-    )
-
-    loan
-  end
-rescue ActiveRecord::RecordNotUnique
-  # DB-Index greift bei konkurrierenden INSERTs und wird abgefangen
-  raise LoanError, "Das Gerät wurde inzwischen von einem anderen Benutzer ausgeliehen."
-end
-```
+Die Methode verwendet `device.with_lock` und eine Datenbanktransaktion. So wird verhindert, dass zwei Benutzer dasselbe Gerät gleichzeitig ausleihen.
 
 ### 4.4 Datenbank-Constraint (Partieller Index)
-In der Migration `CreateLoans` wurde folgender Index angelegt:
+
+In der Migration `CreateLoans` wird dafür ein Index angelegt:
 
 ```ruby
 add_index :loans, :device_id,
@@ -233,91 +188,46 @@ add_index :loans, :device_id,
 ```
 
 **Bedeutung:**
-- Ein Gerät kann in der Historie beliebig viele abgeschlossene Ausleihen haben (`returned_at IS NOT NULL`).
-- Aber es kann **exakt eine oder null** Zeilen geben, bei denen `returned_at IS NULL` ist.
-- Versucht ein paralleler Prozess dennoch eine zweite aktive Ausleihe anzulegen, wirft der Datenbank-Kern sofort einen `ActiveRecord::RecordNotUnique`, welcher vom Controller in die benutzerfreundliche Fehlermeldung umgewandelt wird.
+
+- Ein Gerät kann beliebig viele abgeschlossene Ausleihen haben (`returned_at IS NOT NULL`).
+- Es kann aber nur eine aktive Ausleihe geben, bei der `returned_at IS NULL` ist.
+- Wenn trotzdem eine zweite aktive Ausleihe gespeichert werden soll, löst die Datenbank `ActiveRecord::RecordNotUnique` aus. Der Controller zeigt dem Benutzer danach eine verständliche Fehlermeldung.
 
 ### 4.5 Transaktionsablauf bei Rückgaben
-Auch die Rückgabe erfolgt sperrend innerhalb einer Transaktion via `loan.return!(user)`. Es wird verifiziert, dass die ausführende Person entweder der Eigentümer der Ausleihe oder ein Administrator ist. Nach Setzen von `returned_at = Time.current` ist der partielle Index sofort wieder frei für eine Neuausleihe.
+
+Auch die Rückgabe läuft innerhalb einer Transaktion mit `loan.return!(user)`. Dabei wird geprüft, ob die Person die Ausleihe selbst besitzt oder Administrator ist. Nach dem Setzen von `returned_at` ist der partielle Index sofort wieder frei für eine Neuausleihe.
 
 ---
 
 ## 5. Domänenmodell und Architektur (ERM)
 
 ### 5.1 Entitäten und Relationen
-Das System modelliert vier Kern-Entitäten:
-- **User:** Repräsentiert authentifizierte Personen mit Name, E-Mail, Passwort-Hash und Rolle (`user` oder `admin`).
-- **Device:** Die physischen Geräte mit Name, Kategorie, Inventar-Code, Beschreibung und Status (`active`).
-- **Loan:** Die Ausleihbeziehung zwischen User und Device mit Zeitstempeln (`borrowed_at`, `returned_at`) und Notizen.
-- **ActivityLog:** Das Audit-Protokoll, das alle Mutationen mit Zeitstempel und Akteur speichert.
+
+Das System verwendet vier wichtige Entitäten:
+
+- **User:** Angemeldete Person mit Name, E-Mail, Passwort-Hash und Rolle (`user` oder `admin`).
+- **Device:** Ein Gerät mit Name, Kategorie, Inventar-Code, Beschreibung und Status (`active`).
+- **Loan:** Verbindet einen User mit einem Device und speichert `borrowed_at`, `returned_at` und Notizen.
+- **ActivityLog:** Speichert wichtige Änderungen mit Zeitstempel und Benutzer.
 
 ### 5.2 ERM-Diagramm
 
-```mermaid
-erDiagram
-    USER ||--o{ LOAN : "leiht aus"
-    USER ||--o{ ACTIVITY_LOG : "verursacht"
-    DEVICE ||--o{ LOAN : "wird ausgeliehen"
-
-    USER {
-        int id PK
-        string name
-        string email UK
-        string password_digest
-        string role "user | admin"
-        boolean active "default true"
-        datetime created_at
-        datetime updated_at
-    }
-
-    DEVICE {
-        int id PK
-        string name
-        string category "Laptop | Kamera | Zubehoer | ..."
-        string inventory_code UK "e.g. LAP-001"
-        text description
-        boolean active "default true"
-        datetime created_at
-        datetime updated_at
-    }
-
-    LOAN {
-        int id PK
-        int user_id FK
-        int device_id FK
-        datetime borrowed_at
-        datetime returned_at "NULL = aktiv"
-        text notes
-        datetime created_at
-        datetime updated_at
-    }
-
-    ACTIVITY_LOG {
-        int id PK
-        int user_id FK "optional"
-        string action "borrow | return | create | ..."
-        string record_type "Device | Loan | User"
-        int record_id
-        text details
-        datetime created_at
-    }
-```
-
-![ERM Diagramm](images/erm_diagram.png)
-*Abbildung 5.1: Ursprünglicher ERM-Entwurf aus dem Projektantrag*
+![ERM-Diagramm](images/erm_diagram.png)
 
 ### 5.3 Tabellendefinitionen und Datentypen
 
 #### Tabelle `users`
+
 - `id`: INTEGER PRIMARY KEY AUTOINCREMENT
 - `name`: VARCHAR NOT NULL
 - `email`: VARCHAR NOT NULL (Index: UNIQUE)
 - `password_digest`: VARCHAR NOT NULL (BCrypt Hash)
-- `role`: VARCHAR NOT NULL DEFAULT 'user'
+- `role`: VARCHAR NOT NULL DEFAULT `'user'`
 - `active`: BOOLEAN NOT NULL DEFAULT TRUE
 - `timestamps`: `created_at`, `updated_at`
 
 #### Tabelle `devices`
+
 - `id`: INTEGER PRIMARY KEY AUTOINCREMENT
 - `name`: VARCHAR NOT NULL
 - `category`: VARCHAR NOT NULL (Index)
@@ -327,66 +237,49 @@ erDiagram
 - `timestamps`: `created_at`, `updated_at`
 
 #### Tabelle `loans`
+
 - `id`: INTEGER PRIMARY KEY AUTOINCREMENT
-- `user_id`: INTEGER NOT NULL (FK -> users.id)
-- `device_id`: INTEGER NOT NULL (FK -> devices.id)
+- `user_id`: INTEGER NOT NULL (FK -> `users.id`)
+- `device_id`: INTEGER NOT NULL (FK -> `devices.id`)
 - `borrowed_at`: DATETIME NOT NULL
 - `returned_at`: DATETIME (Index, NULL = aktiv)
 - `notes`: TEXT
 - `timestamps`: `created_at`, `updated_at`
-- **Partieller Unique Index:** `idx_unique_active_loan_per_device` auf `device_id WHERE returned_at IS NULL`
+- **Partieller Unique Index:** `idx_unique_active_loan_per_device`
 
 #### Tabelle `activity_logs`
+
 - `id`: INTEGER PRIMARY KEY AUTOINCREMENT
-- `user_id`: INTEGER NULL (FK -> users.id)
+- `user_id`: INTEGER NULL (FK -> `users.id`)
 - `action`: VARCHAR NOT NULL (Index)
 - `record_type`: VARCHAR
 - `record_id`: INTEGER
 - `details`: TEXT
-- `timestamps`: `created_at`, `updated_at` (Index auf `created_at`)
+- `timestamps`: `created_at`, `updated_at`
 
 ---
 
 ## 6. User Flows & Breadboards
 
 ### 6.1 Breadboard-Konzept der 1. Iteration
-Das Breadboard visualisiert Navigationsknoten, Aktionen und Statusübergänge.
 
-```mermaid
-flowchart TD
-    Login["Screen: Login<br/>(E-Mail / Passwort)"] -->|Erfolgreich| Overview["Screen: Geräteübersicht<br/>(Alle Geräte & Status)"]
-    
-    Overview -->|Klick 'Ausleihen'| BorrowAction{"Transaktion:<br/>Prüfe & Lock Device"}
-    BorrowAction -->|Frei| SuccessBanner["Flash: Erfolgreich ausgeliehen"]
-    BorrowAction -->|Bereits vergeben| ErrorBanner["Flash: Inzwischen vergeben!"]
-    
-    SuccessBanner --> MyLoans["Screen: Meine Ausleihen<br/>(Aktive & Historie)"]
-    ErrorBanner --> Overview
-    
-    MyLoans -->|Klick 'Zurückgeben'| ReturnAction{"Transaktion:<br/>Setze returned_at"}
-    ReturnAction -->|Erfolgreich| MyLoans
-    
-    subgraph Admin_Bereich["Administrator Bereich"]
-        AdminDevices["Screen: Geräteverwaltung"] -->|Neu / Edit| DeviceForm["Screen: Geräteformular"]
-        DeviceForm -->|Speichern| AdminDevices
-        AdminDevices -->|Toggle| AdminDevices
-        AdminLoans["Screen: Alle Ausleihen"] -->|Rückgabe erzwingen| AdminLoans
-        AdminUsers["Screen: Benutzerverwaltung"] -->|Rolle / Status ändern| AdminUsers
-        AdminLogs["Screen: Aktivitätsprotokoll"]
-    end
-    
-    Overview -.->|Admin Navigation| AdminDevices
-```
+Das Breadboard zeigt die wichtigsten Seiten, Aktionen und Übergänge der Applikation der ersten Iteration.
 
-![Breadboard Skizze](images/breadboard.png)
-*Abbildung 6.1: Ursprüngliche Breadboard-Skizze aus dem Projektantrag*
+#### Erste Iteration
+
+![Breadboard der ersten Iteration](images/breadboard_iteration_1.png)
+
+#### Neue Iteration
+
+![Breadboard der neuen Iteration](images/breadboard_iteration_2.png)
 
 ---
 
 ## 7. Benutzerschnittstelle & Wireframes
 
 ### 7.1 Konzeptskizzen (Fat-Marker-Sketches)
-Die nachfolgenden Skizzen dienten als Entwurfsgrundlage für die Screens der 1. Iteration:
+
+Die folgenden Skizzen dienten als Vorlage für die Screens der ersten Iteration:
 
 | Skizze aus Antrag | Beschreibung |
 | :--- | :--- |
@@ -399,7 +292,8 @@ Die nachfolgenden Skizzen dienten als Entwurfsgrundlage für die Screens der 1. 
 | ![Admin Ausleihen Skizze](images/sketch_07_admin_loans.png) | **7. Admin Alle Ausleihen:** Zentrale Übersicht aller Leihvorgänge. |
 
 ### 7.2 Implementierte Screens (Gegenüberstellung)
-Die tatsächliche Implementierung greift sämtliche Wireframes 1:1 auf und erweitert sie mit modernem Styling, Badges und Filterleisten:
+
+Die umgesetzten Screens orientieren sich an den Wireframes und enthalten zusätzlich Styling, Statusanzeigen und Filter:
 
 | Implementierter Screen | Beschreibung |
 | :--- | :--- |
@@ -418,55 +312,72 @@ Die tatsächliche Implementierung greift sämtliche Wireframes 1:1 auf und erwei
 ## 8. Erreichter Stand & Umsetzung
 
 ### 8.1 Implementierte Features
-Die Entwicklung wurde vollständig abgeschlossen und deckt alle Anforderungen des Pflichtenhefts und des Kompetenznachweises ab:
 
-- **Vollständige Multi-User-Architektur:** Sichere Session-Authentifizierung mit BCrypt-Passwort-Hashing.
-- **Rollen- & Rechtesystem:** Trennung zwischen normalen Benutzern und Administratoren via Before-Action-Filtern im Controller.
-- **Transaktionsgestützte Ausleihe:** Pessimistisches Locking (`with_lock`) und SQLite Partial Unique Index zur Verhinderung jeglicher Doppelbelegungen.
+Die folgenden Funktionen wurden umgesetzt:
+
+- **Multi-User-System:** Anmeldung über Sessions mit BCrypt-Passwort-Hashing.
+- **Rollen und Rechte:** Normale Benutzer und Administratoren haben unterschiedliche Berechtigungen. Die Prüfung erfolgt über Before-Action-Filter im Controller.
+- **Ausleihe mit Transaktion:** Pessimistisches Locking (`with_lock`) und ein SQLite Partial Unique Index verhindern Doppelbelegungen.
 - **Gerätekatalog:** Filterung nach Kategorien (Laptop, Kamera, Zubehör, Audio, Tablet) und Volltextsuche über Name und Inventarnummer.
 - **Rückgabeprozess:** Sichere Rückgabe mit Validierung der Berechtigung (nur Eigentümer oder Administrator).
 - **Benutzerprofil:** Selbstverwaltung von Name, E-Mail und Passwort mit Sicherheitsprüfung des Alt-Passworts.
 - **Benutzerverwaltung:** Administratives Ernennen/Degradieren von Admins und Sperren von Konten.
-- **Audit-Protokollierung:** Automatisches Logging aller geschäftsrelevanten Aktionen in der Tabelle `activity_logs`.
-- **Benutzerfreundliches User Feedback:** Aussagekräftige Flash-Meldungen, erhaltene Formulardaten bei Validierungsfehlern und keine Roh-Exceptions.
+- **Aktivitätsprotokoll:** Wichtige Aktionen werden automatisch in der Tabelle `activity_logs` gespeichert.
+- **Fehlermeldungen:** Benutzer erhalten verständliche Flash-Meldungen. Formulardaten bleiben bei Validierungsfehlern erhalten und technische Exceptions werden nicht direkt angezeigt.
 
 ---
 
 ## 9. Begründete Abweichungen vom initialen Antrag
 
-Gegenüber dem initialen Projektantrag wurden folgende **gezielte Funktionserweiterungen** vorgenommen, um sämtliche Kriterien des Bewertungsrasters (Kompetenznachweis Modul 223, ilv) mit maximaler Punktzahl zu erfüllen:
+Im Vergleich zum ursprünglichen Projektantrag wurden einige Funktionen ergänzt, damit die Anforderungen des Kompetenznachweises erfüllt werden:
 
 1. **Ergänzung des Aktivitätsprotokolls (`activity_logs`):**
-   - *Begründung:* Im Bewertungsbogen wird der Punkt *«Aktivitätsprotokoll»* mit 2 Punkten explizit bewertet. Das System speichert nun jede Ausleihe, Rückgabe, Gerätemutation und Statusänderung revisionssicher.
+   - Begründung: Das Aktivitätsprotokoll ist Teil des Bewertungsrasters. Deshalb werden Ausleihen, Rückgaben, Änderungen an Geräten und Statusänderungen gespeichert.
+
 2. **Ergänzung der Benutzerverwaltung (`/admin/users`):**
-   - *Begründung:* Der Bewertungsbogen verlangt eine administrative *«Benutzerverwaltung»* (2 Punkte). Admins können nun Benutzerrollen anpassen und Konten aktivieren/deaktivieren.
+   - Begründung: Die Benutzerverwaltung wird im Bewertungsraster verlangt. Administratoren können deshalb Rollen ändern und Konten aktivieren oder deaktivieren.
+
 3. **Ergänzung des Benutzerprofils (`/profile`):**
-   - *Begründung:* Kriterium *«Benutzerprofil»* (2 Punkte). Benutzer können ihre Angaben und ihr Passwort eigenständig verwalten und ihre persönliche Ausleihstatistik einsehen.
+   - Begründung: Das Benutzerprofil ist ein Kriterium im Bewertungsraster. Benutzer können ihre Angaben und ihr Passwort selbst verwalten und ihre Ausleihen sehen.
+
 4. **Zweistufiges Locking (DB-Constraint):**
-   - *Begründung:* Ergänzend zum applikatorischen Locking wurde ein partieller Unique-Index (`WHERE returned_at IS NULL`) in die SQLite-Datenbank integriert, um absolute Ausfallsicherheit selbst bei direkten Datenbank-Schreibzugriffen zu gewährleisten.
+   - Begründung: Zusätzlich zum Locking in der Applikation gibt es einen partiellen Unique-Index (`WHERE returned_at IS NULL`) in SQLite. Er verhindert eine zweite aktive Ausleihe auch auf Datenbankebene.
 
 ---
 
 ## 10. Testkonzept und Anforderungsprüfung (Testprotokoll)
 
 ### 10.1 Teststrategie
-Zur Sicherstellung höchster Softwarequalität wurde eine umfassende Test-Suite mit Rails Minitest implementiert. Die Tests sind in Unit-Tests (Modelle), Integrationstests (Controller & Flows) und Concurrency-Tests (Multi-Threading) unterteilt.
+
+Für die Applikation wurde eine Test-Suite mit Rails Minitest erstellt. Sie enthält Unit-Tests für Modelle, Integrationstests für Controller und Abläufe sowie Concurrency-Tests mit mehreren Threads.
 
 ### 10.2 Prüfung der zentralen Fachregel
-Die zentrale Fachregel lautete:
-> *«Ein Gerät darf gleichzeitig höchstens eine aktive Ausleihe besitzen. Ist ein Gerät bereits ausgeliehen, wird die zweite Ausleihe abgelehnt.»*
 
-Dies wird in `test/models/loan_test.rb` mehrfach verifiziert:
-1. `test_zentrale_Fachregel:_erfolgreiche_Ausleihe_eines_verfuegbaren_Geraets`: Ein freies Gerät wird erfolgreich geliehen.
-2. `test_zentrale_Fachregel:_zweite_Ausleihe_fuer_bereits_ausgeliehenes_Geraet_wird_abgewiesen`: Versuch einer zweiten Ausleihe wirft die definierte `Loan::LoanError`-Exception mit der exakten Meldung.
-3. `test_zentrale_Fachregel:_Modellvalidierung_verhindert_zweite_aktive_Ausleihe`: ActiveModel-Validierung fängt den Versuch auf Modellebene ab.
-4. `test_zentrale_Fachregel:_Datenbank-Unique-Index_verhindert_gleichzeitige_aktive_Ausleihen_auf_DB-Ebene`: Selbst bei Umgehung der Validierung blockiert SQLite den Vorgang via `ActiveRecord::RecordNotUnique`.
+Die zentrale Fachregel lautet:
+
+> **Ein Gerät darf gleichzeitig höchstens eine aktive Ausleihe besitzen. Ist ein Gerät bereits ausgeliehen, wird die zweite Ausleihe abgelehnt.**
+
+Das wird in `loan_test.rb` mehrfach geprüft:
+
+1. `test_zentrale_Fachregel:_erfolgreiche_Ausleihe_eines_verfuegbaren_Geraets`  
+   Ein freies Gerät wird erfolgreich geliehen.
+
+2. `test_zentrale_Fachregel:_zweite_Ausleihe_fuer_bereits_ausgeliehenes_Geraet_wird_abgewiesen`  
+   Eine zweite Ausleihe wird mit der definierten `Loan::LoanError`-Exception abgewiesen.
+
+3. `test_zentrale_Fachregel:_Modellvalidierung_verhindert_zweite_aktive_Ausleihe`  
+   Die ActiveModel-Validierung verhindert eine zweite aktive Ausleihe.
+
+4. `test_zentrale_Fachregel:_Datenbank-Unique-Index_verhindert_gleichzeitige_aktive_Ausleihen_auf_DB-Ebene`  
+   Auch wenn die Validierung umgangen wird, blockiert SQLite den Vorgang mit `ActiveRecord::RecordNotUnique`.
 
 ### 10.3 Concurrency-Test (Multi-Threading)
-In `test/models/concurrency_test.rb` wird ein realer Wettlauf (*Race Condition*) von zwei parallelen OS-Threads auf denselben Datensatz simuliert. Das Testergebnis bestätigt:
-- **Exakt 1 Thread** war erfolgreich.
-- **Exakt 1 Thread** wurde abgewiesen mit der verständlichen Meldung.
-- In der Datenbank existiert **genau 1 aktiver Leihsatz**.
+
+Im Test `concurrency_test.rb` wird eine Race Condition mit zwei parallelen Threads auf denselben Datensatz simuliert. Das Ergebnis zeigt:
+
+- Genau ein Thread war erfolgreich.
+- Genau ein Thread wurde mit einer verständlichen Meldung abgewiesen.
+- In der Datenbank bleibt genau eine aktive Ausleihe.
 
 ### 10.4 Tabellarisches Testprotokoll (62 Tests, 282 Assertions)
 
@@ -481,18 +392,23 @@ In `test/models/concurrency_test.rb` wird ein realer Wettlauf (*Race Condition*)
 | `test/controllers/devices_controller_test.rb` | Login-Pflicht, Geräteübersicht, Kategoriefilter, Suchfunktion, Detailansicht | 5 | **100% PASS** |
 | `test/controllers/loans_controller_test.rb` | Ausleihe verarbeiten, Abweisung vergebenes Gerät, Rückgabe eigener Ausleihe, Schutz vor Fremdrückgabe, Admin-Rückgabe | 7 | **100% PASS** |
 | `test/controllers/profiles_controller_test.rb` | Sichtbarkeit eigenes Profil, Stammdatenänderung, Passwortänderung mit Verifikation des Altpassworts | 5 | **100% PASS** |
-| `test/controllers/admin_controllers_test.rb` | **Berechtigungsschranken:** User wird bei allen Admin-URLs abgewiesen (`Zugriff verweigert`). Admin-CRUD für Geräte, Status-Toggle, Deaktivierungsschutz bei aktiver Ausleihe, Rollenwechsel, Eigenschutz vor Selbstlöschung/Selbstdegradierung, Audit-Log Ansicht | 15 | **100% PASS** |
-| **Total** | **Vollständige Testabdeckung aller Systemkomponenten** | **62 Tests** (282 Assertions) | **100% Erfolgreich (0 Fehler, 0 Skips)** |
+| `test/controllers/admin_controllers_test.rb` | Berechtigungsschranken, Admin-CRUD für Geräte, Status-Toggle, Deaktivierungsschutz, Rollenwechsel, Eigenschutz, Audit-Log Ansicht | 15 | **100% PASS** |
+| **Total** | **Vollständige Testabdeckung aller Systemkomponenten** | **62 Tests (282 Assertions)** | **100% Erfolgreich (0 Fehler, 0 Skips)** |
 
 ---
 
 ## 11. Reflexion und Fazit
 
 ### 11.1 Erkenntnisse bei der Entwicklung von Multi-User-Systemen
-1. **Gleichzeitigkeit ist kein Zufall:** In Mehrbenutzersystemen reicht eine einfache Überprüfung im Controller (`if device.available?`) niemals aus. Zwischen der Prüfung und dem Speichern liegt immer ein Zeitfenster (*Time-of-Check to Time-of-Use*, TOCTOU), in dem andere Requests den Zustand ändern können.
-2. **Pessimistisches Locking vs. Optimistisches Locking:** Für den Ausleihvorgang erwies sich pessimistisches Sperren (`SELECT FOR UPDATE` bzw. `with_lock`) als ideale Wahl, da Konflikte bei begehrter Hardware aktiv vermieden werden müssen, anstatt den Vorgang nach Kollision erst spät zu verwerfen.
-3. **Defense-in-Depth:** Die Kombination aus ActiveModel-Validierungen, Transaktionslocks und einem partiellen Unique-Constraint im Datenbankschema bietet absolute Sicherheit gegen Dateninkonsistenzen.
-4. **Benutzererlebnis bei Fehlern:** Benutzer dürfen durch Sperren nicht mit technischen Fehlern konfrontiert werden. Das Abfangen von Sperr- und Eindeutigkeitsfehlern und deren Übersetzung in handlungsorientierte Hinweise ist essenziell für die Akzeptanz der Anwendung.
+
+1. **Gleichzeitige Zugriffe:** In einem Multi-User-System reicht eine einfache Prüfung im Controller wie `if device.available?` nicht aus. Zwischen Prüfen und Speichern kann ein anderer Request den Zustand ändern. Dieses Problem wird auch TOCTOU genannt.
+
+2. **Pessimistisches Locking:** Für die Ausleihe eignet sich `SELECT FOR UPDATE` beziehungsweise `with_lock`. Dadurch wird ein Konflikt direkt verhindert, bevor zwei Ausleihen gespeichert werden.
+
+3. **Mehrere Schutzebenen:** ActiveModel-Validierungen, Transaktionslocks und ein partieller Unique-Constraint schützen gemeinsam vor doppelten aktiven Ausleihen.
+
+4. **Fehlerbehandlung:** Technische Fehler werden abgefangen und in verständliche Meldungen umgewandelt. So wissen Benutzer, was passiert ist und was sie tun können.
 
 ### 11.2 Fazit
-Das Projekt **GearShare** wurde termingerecht, vollständig und in höchster Qualität realisiert. Alle Vorgaben aus dem Projektantrag, der Modulwegleitung und dem Bewertungsraster des Kompetenznachweises 223 wurden erfüllt und übertroffen. Die Codebasis ist modular aufgebaut, folgt strengen Rails-Konventionen und ist durch 62 automatisierte Tests nachhaltig abgesichert.
+
+GearShare wurde wie geplant umgesetzt. Die wichtigsten Anforderungen des Projektantrags und des Kompetenznachweises sind enthalten. Der Code ist nach Rails-Konventionen aufgebaut und wird mit 62 automatisierten Tests geprüft.
