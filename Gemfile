@@ -67,4 +67,4 @@ end
 
 gem "bcrypt", "~> 3.1"
 
-gem "json", "~> 2.21.0"
+gem "json", "~> 3.1.0"
